@@ -8,13 +8,16 @@ var requestedCurrency = if ( !isEmpty(vars.queryParams.currencyCode) ) vars.quer
 var operation = vars.method
 fun currencyConversion(price, currencyCode, operation) =
  // For GET operation
-(if ( operation == "GET" ) if ( requestedCurrency == "USD" ) round(price,2)
-        else
-            round(price * curRates[requestedCurrency],2)
-    else  // For POST/PUT operations
-        if ( currencyCode == "USD" ) round(price,2)
-        else
-            round(price / curRates[currencyCode],2)
+(if (operation == "GET") 
+    if (requestedCurrency == "USD") 
+        ((price)as String {format: "0.00"}) as Number
+    else
+        ((price * curRates[requestedCurrency]) as String {format: "0.00"}) as Number
+ else  // For POST/PUT operations
+    if (currencyCode == "USD") 
+        ((price) as String {format: "0.00"}) as Number
+    else
+        ((price / curRates[currencyCode]) as String {format: "0.00"}) as Number
 )
 output application/json
 ---
