@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="products-get-implementation-subflow" doc:id="b5b2f1ac-da61-4d38-9019-55376c96c5cf" >
+		<ee:transform doc:name="updateFlowname" doc:id="ceee75e3-81b0-4818-af12-96b9e1336319">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="loggingVars"><![CDATA[%dw 2.0
+output application/json
+---
+vars.loggingVars update {
+	case .flowName -> "products-get-implementation-subflow"
+}
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="common-flow-start-logging-subflow" doc:id="2b6788a0-6bee-45d1-b7f7-1f48608581a6" name="common-flow-start-logging-subflow" />
+		<flow-ref doc:name="common-before-request-logging-subflow" doc:id="f3065a00-647f-42c3-ae16-4a15e3d9f41f" name="common-before-request-logging-subflow" />
+		<flow-ref doc:name="common-salesforce-product-sapi-request-subflow" doc:id="475fd7dd-f0c1-4123-a655-95b3a006745a" name="common-salesforce-product-sapi-request-subflow"/>
+		<flow-ref doc:name="common-after-request-logging-subflow" doc:id="d54c9bd0-2d79-4707-bf8a-1e4626474755" name="common-after-request-logging-subflow" />
+		<flow-ref doc:name="common-before-request-logging-subflow" doc:id="60758262-3b44-4680-b087-b627dd0f88b4" name="common-before-request-logging-subflow" />
+		<flow-ref doc:name="common-currency-exchange-api-request-subflow" doc:id="f68b924a-fa46-4d5b-8696-bd2ae4705b6f" name="common-currency-exchange-api-request-subflow"/>
+		<flow-ref doc:name="common-currency-conversion-subflow" doc:id="eb5905c9-5d7e-4668-adad-a5e07204f247" name="common-currency-conversion-subflow"/>
+		<flow-ref doc:name="common-after-request-logging-subflow" doc:id="d23d28f3-6b37-4050-8aab-937e83596463" name="common-after-request-logging-subflow" />
+		<flow-ref doc:name="common-flow-end-logging-subflow" doc:id="8665e4c3-8fa2-4ec0-9279-2506e35ec750" name="common-flow-end-logging-subflow" />
+	</sub-flow>
+</mule>

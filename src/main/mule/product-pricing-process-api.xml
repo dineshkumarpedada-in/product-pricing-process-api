@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <flow name="product-pricing-process-api-main">
+        <http:listener config-ref="HTTP_Listener_config_new" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+		<ee:transform doc:name="initVariables" doc:id="008b4ea3-5df6-42aa-95a2-3ba687509ba4">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="apiKickOffTime"><![CDATA[%dw 2.0
+import * from dw::util::Timer
+output application/json
+---
+currentMilliseconds()]]></ee:set-variable>
+				<ee:set-variable resource="dwl/loggingVars.dwl" variableName="loggingVars" />
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="common-process-start-logging-subflow" doc:id="5dbad8c9-f711-4454-81ce-a91480e4adf4" name="common-process-start-logging-subflow" />
+		<apikit:router config-ref="product-pricing-process-api-config"/>
+		<flow-ref doc:name="common-process-end-logging-subflow" doc:id="98d640af-51a8-47ba-adde-b279efc248e9" name="common-process-end-logging-subflow" />
+    </flow>
+	<flow name="get:\api-status:product-pricing-process-api-config">
+		<ee:transform doc:name="set api status response" doc:id="27d45356-3f2e-4be4-98c4-914c9cbc94b1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "apiName": Mule::p('api.Name'),
+  "status": Mule::p('api.status'),
+  "apiVersion": Mule::p('api.Version'),
+  "correlationId": vars.loggingVars.correlationId default correlationId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+    </flow>
+	<flow name="get:\products:product-pricing-process-api-config">
+		<ee:transform doc:name="setRequestVars" doc:id="7ff82789-59e4-4e26-9c58-71ad2aac28eb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA["GET"]]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA["api/products"]]></ee:set-variable>
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/json
+---
+attributes.queryParams]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="products-get-implementation-subflow" doc:id="2736f759-2f94-47ec-a1a0-4da6eea80345" name="products-get-implementation-subflow" />
+    </flow>
+	<flow name="post:\products:application\json:product-pricing-process-api-config">
+		<ee:transform doc:name="setRequestVars" doc:id="74d4d012-cd68-4faf-ad37-67217f029ef6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA["POST"]]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA["api/products"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="product-request-implementation-subflow" doc:id="a3cf6761-4edd-4290-be38-df9a6ac69ce5" name="products-post-upsert-implementation-subflow" />
+    </flow>
+    <flow name="patch:\products\(productId):application\json:product-pricing-process-api-config">
+		<ee:transform doc:name="setRequestVars" doc:id="bcd9fac6-af94-49cc-b2d4-30f3229d89fe" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA["PATCH"]]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA["api/products/" ++ attributes.uriParams.productId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="product-request-implementation-subflow" doc:id="63b648e8-834b-4815-8901-13f3c261781d" name="products-post-upsert-implementation-subflow" />
+    </flow>
+	<flow name="delete:\products\(productId):product-pricing-process-api-config">
+		<ee:transform doc:name="setRequestVars" doc:id="c28023e4-23c0-4d80-ac61-f1e21f7909ee">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="method"><![CDATA["DELETE"]]></ee:set-variable>
+				<ee:set-variable variableName="path"><![CDATA["api/products/" ++ attributes.uriParams.productId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="product-request-implementation-subflow" doc:id="ef69147e-95d9-4fca-9a11-f1a0ffb22688" name="products-delete-implementation-subflow" />
+    </flow>
+</mule>

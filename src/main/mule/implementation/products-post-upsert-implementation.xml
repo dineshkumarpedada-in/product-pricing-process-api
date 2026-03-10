@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="products-post-upsert-implementation-subflow" doc:id="74662e04-9a0a-4e65-816c-1ced3876f44d" >
+		<ee:transform doc:name="updateFlowname" doc:id="72d12d1c-5ba2-4233-ac8a-3b170c95a889" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="loggingVars" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.loggingVars update {
+	case .flowName -> "products-post-upsert-implementation-subflow"
+}
+]]></ee:set-variable>
+				<ee:set-variable variableName="products" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"records": payload
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="common-flow-start-logging-subflow" doc:id="0540e6b0-506c-4110-9136-4667608eb97b" name="common-flow-start-logging-subflow" />
+		<flow-ref doc:name="common-before-request-logging-subflow" doc:id="8fbbd466-38ea-407b-ba92-da7065a6ad88" name="common-before-request-logging-subflow" />
+		<flow-ref doc:name="common-currency-exchange-api-request-subflow" doc:id="8e1c73d8-4787-42b9-86f1-1de3aaa5eb57" name="common-currency-exchange-api-request-subflow" />
+		<flow-ref doc:name="common-after-request-logging-subflow" doc:id="42ecb4f1-2b77-4791-abbf-5e476e1aa446" name="common-after-request-logging-subflow" />
+		<flow-ref doc:name="common-currency-conversion-subflow" doc:id="0e364a3d-9b0e-4365-a9d4-5856770c0e47" name="common-currency-conversion-subflow" />
+		<flow-ref doc:name="common-before-request-logging-subflow" doc:id="e0747935-2f7e-4db3-8fa8-7bc42fbdf1cd" name="common-before-request-logging-subflow" />
+		<flow-ref doc:name="common-salesforce-product-sapi-request-subflow" doc:id="bcb944b3-c400-425a-850c-f6536016db4a" name="common-salesforce-product-sapi-request-subflow" />
+		<ee:transform doc:name="sapiResponse" doc:id="baf75c26-d25d-4b7b-b95b-a250b77cb85e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.products]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="common-after-request-logging-subflow" doc:id="a62543b7-89ea-468c-830b-f085ba763ec9" name="common-after-request-logging-subflow" />
+		<flow-ref doc:name="common-flow-end-logging-subflow" doc:id="bdbba7a6-9d0c-4a03-bb1b-e302bf1e70a2" name="common-flow-end-logging-subflow" />
+	</sub-flow>
+</mule>
