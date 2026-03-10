@@ -8,13 +8,14 @@ var requestedCurrency = if ( !isEmpty(vars.queryParams.currencyCode) ) vars.quer
 var operation = vars.method
 fun currencyConversion(price, currencyCode, operation) =
  // For GET operation
-(if ( operation == "GET" ) if ( requestedCurrency == "USD" ) price
+(if ( operation == "GET" ) if ( requestedCurrency == "USD" ) round(price,2)
         else
-            price * curRates[requestedCurrency]
+            round(price * curRates[requestedCurrency],2)
     else  // For POST/PUT operations
-        if ( currencyCode == "USD" ) price
+        if ( currencyCode == "USD" ) round(price,2)
         else
-            price / curRates[currencyCode])
+            round(price / curRates[currencyCode],2)
+)
 output application/json
 ---
 if ( !isEmpty(vars.products.records) ) vars.products.records filter (!isEmpty($.price)) map ((item) -> item update {
