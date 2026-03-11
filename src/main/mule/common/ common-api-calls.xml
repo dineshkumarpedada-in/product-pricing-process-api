@@ -7,6 +7,10 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<sub-flow name="common-salesforce-product-sapi-request-subflow" doc:id="4ab99a2e-19f4-419d-bc7d-0ed6ee60a735" >
 		<http:request method="#[vars.method]" doc:name="SAPI Product Request" doc:id="feff7fe0-2d51-47ee-9894-44ffe60c80c4" config-ref="HTTP_Request_SAPI_configuration" path="#[vars.path]" sendCorrelationId="ALWAYS" correlationId="#[vars.loggingVars.correlationId]" target="products">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+if (vars.method == "GET" or vars.method == "DELETE") "" else payload.records]]]></http:body>
 			<http:query-params><![CDATA[#[vars.queryParams default {}]]]></http:query-params>
 		</http:request>
 	</sub-flow>

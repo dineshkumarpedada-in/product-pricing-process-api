@@ -4,7 +4,7 @@
 
 	<groupId>2527df56-2b74-4a9b-904a-e30d1eb9a4a4</groupId>
 	<artifactId>product-pricing-process-api-impl</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.5</version>
 	<packaging>mule-application</packaging>
 
 	<name>product-pricing-process-api</name>
@@ -14,7 +14,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<app.runtime>4.7.4</app.runtime>
-		<mule.maven.plugin.version>4.1.1</mule.maven.plugin.version>
+		<mule.maven.plugin.version>4.7.0</mule.maven.plugin.version>
 	</properties>
 
 	<build>
@@ -31,13 +31,10 @@
 						<environment>Sandbox</environment>
 						<target>Cloudhub-US-East-2</target>
 						<muleVersion>4.11.0</muleVersion>
-						<username>dpedada32</username>
-						<password>Welcome@2026</password>
 						<applicationName>product-pricing-process-api</applicationName>
 						<replicas>1</replicas>
 						<vCores>0.1</vCores>
 					</cloudhub2Deployment>
-					<classifier>---- select project type ----</classifier>
 				</configuration>
 			</plugin>
 		</plugins>
