@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:vault="http://www.mulesoft.org/schema/mule/vault"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation=" http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/vault http://www.mulesoft.org/schema/mule/vault/current/mule-vault.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<!-- imports for common logging and error handling frameworks -->
+	<configuration-properties
+		doc:name="Environment Configuration properties"
+		doc:id="a249e2d7-10cf-4ce4-8322-01fcd3fd3de1"
+		file="properties/${mule.env}.yaml"
+		doc:description="{mule.env}-secure.yaml -Loading Environment Configuration Properties " />
+	<configuration-properties
+		doc:name="Common Configuration properties"
+		doc:id="1d37924a-6ddf-4e6c-a103-c7509be7196a"
+		file="properties/common.yaml"
+		doc:description="common.yaml - Loading Common Configuration Properties" />
+	<configuration
+		doc:name="Global Error Handler Configuration"
+		doc:id="97e7b431-62cd-4530-8607-1956379a66bf"
+		defaultErrorHandler-ref="globalError_Handler"
+		doc:description="globalError_Handler Configuration" />
+	<global-property doc:name="Global Property"
+		doc:id="57927a62-0ec8-48e7-8041-5a681e0de2d6" name="mule.env"
+		value="local"
+		doc:description="mule.env = local - overwrite by VM args!" />
+	<global-property doc:name="Global Property"
+		doc:id="0f02d54c-0e9c-4ff6-98b1-3e94e8be3e7b" name="secure.key"
+		value="GbRbxVjnp4NkwUjHRDRXeEFyGM9nWd5g"
+		doc:description="Local encryption key - overwrite by VM args!" />
+	<apikit:config name="product-pricing-process-api-config"
+		api="resource::2527df56-2b74-4a9b-904a-e30d1eb9a4a4:product-pricing-process-api:1.0.1:raml:zip:product-pricing-process-api.raml"
+		outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" queryParamsStrictValidation="true" />
+	<api-gateway:autodiscovery
+		apiId="${autodiscoveryId}" ignoreBasePath="true"
+		doc:name="API Autodiscovery"
+		doc:id="b65430d7-6f2b-4d6d-ae52-693560d77528"
+		flowRef="product-pricing-process-api-main"
+		doc:description="{autodiscoveryId} 
+		taken form environemnt configuration yamls." /> 
+	<http:listener-config
+		name="HTTP_Listener_config_new" doc:name="HTTP Listener config"
+		doc:id="0282fd6c-8f1a-4818-8212-a438f219ecbb">
+		<http:listener-connection host="0.0.0.0"
+			port="${http.private.port}" readTimeout="300000" />
+	</http:listener-config>
+	<http:request-config
+		name="HTTP_Request_SAPI_configuration"
+		doc:name="HTTP Request configuration"
+		doc:id="e7ae7b46-89c1-468d-bdc2-37ef0372c235"
+		responseTimeout="${sapi.response-timeout}">
+		<http:request-connection host="${sapi.host}"
+			connectionIdleTimeout="300000" />
+		<http:default-headers>
+			<http:default-header key="client_id"
+				value="${application.clientid}" />
+			<http:default-header key="client_secret"
+				value="${secure::application.clientsecret}" />
+		</http:default-headers>
+	</http:request-config>
+	<http:request-config
+		name="HTTP_Request_Exchange_Proxy_configuration"
+		doc:name="HTTP Request configuration"
+		doc:id="0f8bd8c5-ad61-476d-9605-56d58274c41d"
+		responseTimeout="${sapi.response-timeout}">
+		<http:request-connection host="${proxy.host}"
+			connectionIdleTimeout="300000" />
+		<http:default-headers>
+			<http:default-header key="client_id"
+				value="${application.clientid}" />
+			<http:default-header key="client_secret"
+				value="${secure::application.clientsecret}" />
+		</http:default-headers>
+	</http:request-config>
+	<secure-properties:config
+		name="secure-properties-config" doc:name="Secure Properties Config"
+		doc:id="ee188b63-0d14-4717-8aeb-64efc47cf349"
+		file="properties/secure/${mule.env}-secure.yaml" key="${secure.key}" />
+</mule>

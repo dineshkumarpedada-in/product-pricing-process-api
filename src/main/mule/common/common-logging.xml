@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="common-process-start-logging-subflow" doc:id="69dec1c3-2647-4793-b6c3-195919dc6cac" >
+		<async doc:name="Async" doc:id="2e554153-ec13-46ac-a603-d50aa05c71d3" >
+			<ee:transform doc:name="processStartTransformMessage" doc:id="0df28853-4aad-4648-ac8e-5a026eb243b3" >
+				<ee:message >
+					<ee:set-payload resource="dwl/processStartLogger.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="processStartLogger" doc:id="17c8ce7d-f89b-4b53-852d-b83e0e8ec338" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="common-process-end-logging-subflow" doc:id="1c344fc2-055f-443c-8b58-6d259b77639d" >
+		<async doc:name="Async" doc:id="e539f67d-737b-41fe-ac14-c0096c29945a" >
+			<ee:transform doc:name="processEndTransformMessage" doc:id="f87f6e8d-92f2-4b0b-87b7-9cb5a9c27665" >
+				<ee:message >
+					<ee:set-payload resource="dwl/processEndLogger.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="processEndLogger" doc:id="55fb83cb-df45-46ca-9df3-40f4aa6b3543" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="common-flow-start-logging-subflow" doc:id="e27e2137-3362-47d2-b984-4054ff6c64b0" >
+		<async doc:name="Async" doc:id="2f604a25-1983-415f-9f7a-d772a34b02db" >
+			<ee:transform doc:name="flowStartTransformMessage" doc:id="8c366c9c-d44a-4415-99c6-e969badee524" >
+				<ee:message >
+					<ee:set-payload resource="dwl/flowStartLogger.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="flowStartLogger" doc:id="c2455d22-0cb4-4c65-8947-326e7ec3107d" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="common-flow-end-logging-subflow" doc:id="3df060a9-b61a-44e2-b5e8-90134fd5065c" >
+		<async doc:name="Async" doc:id="a6a0335c-e579-4fee-8041-2667ccd66a5c" >
+			<ee:transform doc:name="flowEndTransformMessage" doc:id="6fd20840-ae7f-44f5-93a4-ae0431e22ae3" >
+				<ee:message >
+					<ee:set-payload resource="dwl/flowEndLogger.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="INFO" doc:name="flowEndLogger" doc:id="c2a04d64-6aec-42b8-b4a2-d3699cfc6334" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="common-before-request-logging-subflow" doc:id="e60ecef7-4233-4cac-9fb1-9aab5ffeb3ea" >
+		<async doc:name="Async" doc:id="94a0bbc1-297c-48a6-91e4-23f5f6701c07" >
+			<ee:transform doc:name="beforeRequest" doc:id="3d330004-112c-4c8c-957d-2c6b9db2cbb9" >
+				<ee:message >
+					<ee:set-payload resource="dwl/beforeRequest.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="DEBUG" doc:name="beforeRequest" doc:id="6382ac7a-b85d-4b60-bf88-6da5b926a673" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="common-after-request-logging-subflow" doc:id="4b38665a-5a97-4d17-82f1-7610936e1bfb" >
+		<async doc:name="Async" doc:id="4500e1fc-79ad-4296-95b5-b55a5b6582b7" >
+			<ee:transform doc:name="afterRequest" doc:id="d9694478-4067-4345-81a7-91dd3f15e8cc" >
+				<ee:message >
+					<ee:set-payload resource="dwl/afterRequest.dwl" />
+				
+</ee:message>
+			</ee:transform>
+			<logger level="DEBUG" doc:name="afterRequest" doc:id="3f617807-4da3-4f6b-aa01-f5cf59e10f60" message="#[payload]"/>
+		</async>
+	</sub-flow>
+</mule>

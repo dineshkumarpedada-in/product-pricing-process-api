@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="common-salesforce-product-sapi-request-subflow" doc:id="4ab99a2e-19f4-419d-bc7d-0ed6ee60a735" >
+		<http:request method="#[vars.method]" doc:name="SAPI Product Request" doc:id="feff7fe0-2d51-47ee-9894-44ffe60c80c4" config-ref="HTTP_Request_SAPI_configuration" path="#[vars.path]" sendCorrelationId="ALWAYS" correlationId="#[vars.loggingVars.correlationId]" target="products">
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+if (vars.method == "GET" or vars.method == "DELETE") "" else payload.records]]]></http:body>
+			<http:query-params><![CDATA[#[vars.queryParams default {}]]]></http:query-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="common-currency-exchange-api-request-subflow" doc:id="eae81f67-ad76-4ffd-91f2-110cf277adf2" >
+		<http:request method="${proxy.method}" doc:name="Currency Exchange Proxy Request" doc:id="79759d7f-5e3a-47b5-8005-1b39022a6254" config-ref="HTTP_Request_Exchange_Proxy_configuration" path="${proxy.path}" sendCorrelationId="ALWAYS" correlationId="#[vars.loggingVars.correlationId]" target="exchangeRates" />
+	</sub-flow>
+</mule>

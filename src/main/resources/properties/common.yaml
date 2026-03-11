@@ -1,0 +1,22 @@
+http:
+  private:
+    port: "8081"
+  retries: "3"
+  retryFrequency: "2000"
+
+retry:
+  attempts: "2"
+  frequency: "1000"
+
+api:
+  Name: "product-pricing-process-api"
+  Version: "1.0.0"
+  status: "Running"
+
+step:
+  processStart: "Process start"
+  processEnd: "Process End"
+  flowStart: "Flow Start"
+  flowEnd: "Flow End"
+  beforeRequest: "Before Request"
+  afterRequest: "After Request"
